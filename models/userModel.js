@@ -2,17 +2,29 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    firstName:{
       type: String,
+      default: ""
+    },
+    lastName:{
+      type: String,
+      default: ""
     },
     email: {
       type: String,
+      default: ""
+    },
+    dob:{
+      type: String,
+      default: ""
     },
     image:{
       type: String,
+      default: ""
     },
     password: {
       type: String,
+      default: ""
     },
     role: {
       type: String,
@@ -35,5 +47,5 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.models.users || mongoose.model('users2', userSchema)
+const User = mongoose.models.NewUser || mongoose.model('NewUser', userSchema)
 export default User

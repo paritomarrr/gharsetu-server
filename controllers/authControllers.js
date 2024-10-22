@@ -40,7 +40,7 @@ export const sendOTP = async (req, res) => {
         );
 
         return res.json({
-            success:true,
+            success: true,
             message: `OTP sent to ${phoneNumber}`,
             details: fast2smsRes.body
         });
@@ -73,11 +73,11 @@ export const verifyOTP = async (req, res) => {
             const newUser = new User({ phoneNumber });
             await newUser.save();
 
-            const token  = jwt.sign({ id: newUser._id }, 'secret101', {
+            const token = jwt.sign({ id: newUser._id }, 'secret101', {
                 expiresIn: "30d",
             });
 
-            return res.json({ success: true,  message: "OTP verified successfully", user: newUser, token });
+            return res.json({ success: true, message: "OTP verified successfully", user: newUser, token });
         } else {
             return res.status(400).json({ message: "Incorrect OTP" });
         }
@@ -89,3 +89,23 @@ export const verifyOTP = async (req, res) => {
         });
     }
 };
+
+export const getUser = async (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        return res.status(400).json({ message: "Token is required" })
+    }
+
+    try {
+        const decoded = jwt.verify(token, 'secret101')
+        const user = await User.findById(decoded.id)
+        return res.json({ success: true, user })
+    }
+    catch (err) {
+        console.error(err)
+        return res.status(500).json({
+            message: "An error occurred while verifying token", error: err.message
+        })
+    }
+}

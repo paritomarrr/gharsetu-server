@@ -1,11 +1,15 @@
 import mongoose from "mongoose";
 
 const otpSchema = new mongoose.Schema({
-    phoneNumber :{
+    reqID :{
         type: String,
         required: true
     },
     otp: {
+        type: String,
+        required: true
+    },
+    phoneNumber: {
         type: String,
         required: true
     }
