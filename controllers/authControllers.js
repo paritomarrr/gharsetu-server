@@ -56,12 +56,13 @@ export const sendOTP = async (req, res) => {
 export const verifyOTP = async (req, res) => {
     const { phoneNumber, otp } = req.body;
 
+    // Validate if phone number and OTP are provided
     if (!phoneNumber || !otp) {
         return res.status(400).json({ message: "Phone number and OTP are required" });
     }
 
     try {
-        // Find the OTP entry in the database
+        // Find the OTP entry associated with the phone number
         const otpEntry = await OTP.findOne({ phoneNumber });
 
         if (!otpEntry) {
@@ -69,26 +70,50 @@ export const verifyOTP = async (req, res) => {
         }
 
         // Check if the OTP matches
-        if (otpEntry.otp === otp) {
-            const newUser = new User({ phoneNumber });
-            await newUser.save();
-
-            const token = jwt.sign({ id: newUser._id }, 'secret101', {
-                expiresIn: "30d",
-            });
-
-            return res.json({ success: true, message: "OTP verified successfully", user: newUser, token });
-        } else {
+        if (otpEntry.otp !== otp) {
             return res.status(400).json({ message: "Incorrect OTP" });
         }
+
+        // Look for an existing user with the provided phone number
+        let user = await User.findOne({ phoneNumber });
+
+        if (!user) {
+            // If no user is found, create a new user
+            user = new User({
+                phoneNumber,
+                firstName: "",
+                lastName: "",
+                email: "",
+                dob: "",
+                password: "",
+                image: "",
+            });
+            await user.save();
+        }
+
+        // Generate a JWT token for the user
+        const token = jwt.sign({ id: user._id }, 'secret101', {
+            expiresIn: "30d",
+        });
+
+        // Return success response with the user and token
+        return res.status(200).json({
+            success: true,
+            message: "OTP verified successfully",
+            user,
+            token,
+        });
+
     } catch (error) {
         console.error(error);
+        // Return error response
         return res.status(500).json({
             message: "An error occurred while verifying OTP",
-            error: error.message
+            error: error.message,
         });
     }
 };
+
 
 export const getUser = async (req, res) => {
     const { token } = req.body;
