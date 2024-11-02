@@ -34,6 +34,7 @@ export const saveUserDetails = async (req, res) => {
         currUser.dob = dob;
         currUser.password = password; // Hash the password before saving in production
         currUser.phoneNumber = phoneNumber;
+        currUser.isNewUser = false;
 
         // Save the updated user
         await currUser.save();

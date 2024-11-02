@@ -42,10 +42,14 @@ const userSchema = new mongoose.Schema(
     isAdmin:{
       type: Boolean,
       default: false,
+    },
+    isNewUser:{
+      type: Boolean,
+      default: true,
     }
   },
   { timestamps: true }
 );
 
-const User = mongoose.models.NewUser || mongoose.model('NewUser', userSchema)
+const User = mongoose.models.NewUserr || mongoose.model('NewUserr', userSchema)
 export default User
