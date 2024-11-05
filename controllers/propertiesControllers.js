@@ -58,13 +58,12 @@ export const createProperty = async (req, res) => {
             images
         });
 
-        // const savedProperty = await newProperty.save();
+        const savedProperty = await newProperty.save();
 
         // Respond with the created property
         return res.status(201).json({
             success: true,
             message: "Property created successfully",
-            data: newProperty
         });
     } catch (error) {
         console.error("Error creating property:", error);
