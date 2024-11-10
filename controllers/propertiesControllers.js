@@ -74,3 +74,27 @@ export const createProperty = async (req, res) => {
         });
     }
 };
+
+export const getAllProperties = async (req, res) => {
+    const {mode} = req.body;
+    
+    const properties = await Property.find({availableFor: mode === 'rent' ? 'Rent' : 'Sell'});
+
+    return res.json({
+        message: 'Get all properties',
+        success: true,
+        properties
+    })
+}
+
+
+export const getSingleProperty = async (req, res) => {
+    const {propertyId} = req.body;
+
+    const property = await Property.findById(propertyId);
+
+    return res.json({
+        success: true,
+        property
+    })
+}
