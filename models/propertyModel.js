@@ -12,6 +12,10 @@ const propertySchema = new mongoose.Schema(
             required: true,
             default: false,
         },
+        description:{
+            type: String,
+            required: true,
+        },
         listedBy: {
             type: String,
             required: true,

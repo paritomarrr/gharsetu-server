@@ -29,7 +29,8 @@ export const createProperty = async (req, res) => {
             askedPrice,
             propertyStatus,
             coordinates,
-            images 
+            images,
+            description
         } = req.body;
 
         console.log('oD', ownerId)
@@ -55,8 +56,11 @@ export const createProperty = async (req, res) => {
             askedPrice,
             propertyStatus,
             coordinates,
-            images
+            images,
+            description
         });
+
+        console.log('description', description)
 
         const savedProperty = await newProperty.save();
 
@@ -87,7 +91,6 @@ export const getAllProperties = async (req, res) => {
     })
 }
 
-
 export const getSingleProperty = async (req, res) => {
     const {propertyId} = req.body;
 
@@ -96,5 +99,14 @@ export const getSingleProperty = async (req, res) => {
     return res.json({
         success: true,
         property
+    })
+}
+
+export const getRecentProperties = async (req, res) => {
+    const properties = await Property.find().sort({createdAt: -1}).limit(5);
+
+    return res.json({
+        success: true,
+        properties
     })
 }
