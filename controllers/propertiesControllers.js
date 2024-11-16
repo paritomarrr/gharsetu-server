@@ -110,3 +110,45 @@ export const getRecentProperties = async (req, res) => {
         properties
     })
 }
+
+import mongoose from 'mongoose';
+
+export const deleteProperty = async (req, res) => {
+    const { propertyId, userId } = req.body;
+
+    try {
+        const property = await Property.findById(propertyId);
+
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: 'Property not found'
+            });
+        }
+
+        // Convert both IDs to strings for comparison
+        const ownerIdString = property.ownerId.toString();
+        const userIdString = userId.toString();
+
+        if (ownerIdString !== userIdString) {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        // Using deleteOne() instead of remove() as remove() is deprecated
+        await Property.deleteOne({ _id: propertyId });
+
+        return res.json({
+            success: true,
+            message: 'Property deleted successfully'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error deleting property',
+            error: error.message
+        });
+    }
+};
