@@ -1,4 +1,6 @@
 import Property from '../models/propertyModel.js';
+import User from "../models/userModel.js";
+
 
 export const propertiesTest = (req, res) => {
     res.json({
@@ -111,8 +113,6 @@ export const getRecentProperties = async (req, res) => {
     })
 }
 
-import mongoose from 'mongoose';
-
 export const deleteProperty = async (req, res) => {
     const { propertyId, userId } = req.body;
 
@@ -142,7 +142,7 @@ export const deleteProperty = async (req, res) => {
 
         return res.json({
             success: true,
-            message: 'Property deleted successfully'
+            message: 'Property deleted successfully',
         });
     } catch (error) {
         return res.status(500).json({
@@ -152,3 +152,20 @@ export const deleteProperty = async (req, res) => {
         });
     }
 };
+
+export const sellerProfile = async (req, res) => {
+    const { propertyId } = req.body;
+
+    const property = await Property.findById(propertyId);
+
+
+    const user = await User.findById(property?.ownerId);
+
+    return res.json({
+        success: true,
+        ownerData: {
+            firstName: user?.firstName,
+            lastName: user?.lastName,
+        }
+    })
+}
