@@ -126,6 +126,12 @@ const propertySchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+propertySchema.index({ 
+    "address.locality": 1, 
+    "address.city": 1, 
+    "address.state": 1 
+});
+
 const Property = mongoose.model("PropertyV2", propertySchema);
 
 export default Property;
