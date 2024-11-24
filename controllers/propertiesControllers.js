@@ -232,18 +232,30 @@ export const searchPlaces = async (req, res) => {
   }
 };
 
-export const propertiesInArea = async (req, res) => {
-  const { locality, city, state, mode } = req.body;
-  console.log('locality', locality)
-  console.log('city', city)
-  console.log('state', state)
+export const filteredProperties = async (req, res) => {
+  const { locality, city, mode } = req.body;
+
+  console.log({
+    locality,
+    city,
+    mode
+  })
+
+  const formatLocality = (locality) => {
+    let formatted = locality.replace(/(\d+)/g, ' $1');
+    formatted = formatted.replace(/([a-z])([A-Z])/g, '$1 $2');
+    formatted = formatted.trim();
+    return formatted;
+  };
+
+  console.log('formatted', formatLocality(locality));
+
   try {
 
     const properties = await Property.find({
-      $or: [
-        { "address.locality": locality },
+      $and: [
+        { "address.locality": formatLocality(locality) },
         { "address.city": city },
-        { "address.state": state },
         { "availableFor": mode === 'rent' ? 'Rent' : 'Sell' }
       ]
     });
