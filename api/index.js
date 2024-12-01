@@ -1,11 +1,11 @@
 import express from 'express'
-import userRoutes from './routes/userRoutes.js'
-import PropertiesRoutes from './routes/propertiesRoute.js'
+import userRoutes from '../routes/userRoutes.js'
+import PropertiesRoutes from '../routes/propertiesRoute.js'
 import dotenv from 'dotenv'
-import connectToDb from './utils/connectToDb.js'
-import AuthRoutes from './routes/authRoutes.js'
+import connectToDb from '../utils/connectToDb.js'
+import AuthRoutes from '../routes/authRoutes.js'
 import cors from 'cors'
-import UserPropertiesRoutes from './routes/userProperties.js'
+import UserPropertiesRoutes from '../routes/userProperties.js'
 
 const app = express()
 app.use(cors())
