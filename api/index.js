@@ -21,14 +21,9 @@ app.get('/', (req, res) => {
     })
 })
 
-
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/properties', PropertiesRoutes)
 app.use('/api/v1/auth', AuthRoutes)
 app.use('/api/v1/userProperties', UserPropertiesRoutes)
 
-
-app.listen(8080, () => {
-    console.log('Server is running on port 8080')
-}
-)
+export default app
