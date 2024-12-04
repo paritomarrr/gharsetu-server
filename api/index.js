@@ -6,6 +6,7 @@ import connectToDb from '../utils/connectToDb.js'
 import AuthRoutes from '../routes/authRoutes.js'
 import cors from 'cors'
 import UserPropertiesRoutes from '../routes/userProperties.js'
+import SuggestionRoutes from '../routes/suggestionRoutes.js'
 
 const app = express()
 app.use(cors())
@@ -25,5 +26,10 @@ app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/properties', PropertiesRoutes)
 app.use('/api/v1/auth', AuthRoutes)
 app.use('/api/v1/userProperties', UserPropertiesRoutes)
+app.use('/api/v1/localitySuggestions', SuggestionRoutes)
+
+app.listen(8080, () => {
+    console.log('Server is running on port 8080')
+})
 
 export default app
