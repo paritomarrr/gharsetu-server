@@ -105,12 +105,27 @@ export const getSingleProperty = async (req, res) => {
 }
 
 export const getRecentProperties = async (req, res) => {
-  const properties = await Property.find().sort({ createdAt: -1 }).limit(5);
+  try {
+    const totalProperties = await Property.countDocuments();
+    const limit = Math.min(4, totalProperties);
 
-  return res.json({
-    success: true,
-    properties
-  })
+    const properties = await Property.find()
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    return res.json({
+      success: true,
+      properties,
+      total: totalProperties
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching recent properties",
+      error: error.message
+    });
+  }
 }
 
 export const deleteProperty = async (req, res) => {
