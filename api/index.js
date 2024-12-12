@@ -8,6 +8,7 @@ import cors from 'cors'
 import UserPropertiesRoutes from '../routes/userProperties.js'
 import SuggestionRoutes from '../routes/suggestionRoutes.js'
 import articleRoutes from '../routes/articlesRoutes.js'
+import statsRoutes from '../routes/statsRoutes.js'
 
 const app = express()
 app.use(cors())
@@ -29,6 +30,7 @@ app.use('/api/v1/auth', AuthRoutes)
 app.use('/api/v1/userProperties', UserPropertiesRoutes)
 app.use('/api/v1/localitySuggestions', SuggestionRoutes)
 app.use('/api/v1/articles', articleRoutes)
+app.use('/api/v1/stats', statsRoutes)
 app.use((req, res) => {
     res.status(404).json({ success: false, message: 'Route not found' });
   });

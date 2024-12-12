@@ -98,6 +98,19 @@ export const getSingleProperty = async (req, res) => {
 
   const property = await Property.findById(propertyId);
 
+  if(!property) {
+    return res.status(404).json({
+      success: false,
+      message: "Property not found"
+    })
+  }
+
+  await Property.updateOne({
+    _id: propertyId
+  }, {
+    $inc: {views: 1}
+  })
+
   return res.json({
     success: true,
     property
@@ -113,6 +126,22 @@ export const getRecentProperties = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
+
+      const propertyIds = properties.map(p => p._id);
+      if(propertyIds.length > 0) {
+        await Property.updateMany(
+          {
+            _id: {
+              $in: propertyIds
+            }
+          },
+          {
+            $inc: {
+              impressions: 1
+            }
+          }
+        )
+      }
 
     return res.json({
       success: true,
@@ -289,3 +318,31 @@ export const filteredProperties = async (req, res) => {
     })
   }
 };
+
+export const contactOwner = async (req, res) => {
+  const {propertyId} = req.body;
+  const property = await Property.findById(propertyId);
+  if (!property) {
+    return res.status(404).json({
+      success: false,
+      message: 'Property not found'
+    })
+  }
+
+  await Property.updateOne({
+    _id: propertyId
+  },
+  {
+    $inc: {
+      generatedLeads: 1
+    }
+  }
+)
+
+//TODO : Logic for sending message/notidication to the owner. 
+
+return res.json({
+  success: true,
+  message: "owner contacted."
+})
+}

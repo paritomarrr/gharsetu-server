@@ -122,6 +122,10 @@ const propertySchema = new mongoose.Schema(
             },
         },
         images: { type: Array }, 
+        impressions: { type: Number, default: 0 },
+        views: { type: Number, default: 0 },
+        generatedLeads: { type: Number, default: 0 },
+      
     },
     { timestamps: true }
 );
