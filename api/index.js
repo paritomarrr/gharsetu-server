@@ -9,6 +9,7 @@ import UserPropertiesRoutes from '../routes/userProperties.js'
 import SuggestionRoutes from '../routes/suggestionRoutes.js'
 import articleRoutes from '../routes/articlesRoutes.js'
 import statsRoutes from '../routes/statsRoutes.js'
+import compression from 'compression'; 
 
 const app = express()
 app.use(cors())
@@ -17,6 +18,8 @@ dotenv.config()
 app.use(express.json())
 
 connectToDb()
+
+app.use(compression());
 
 app.get('/', (req, res) => {
     res.json({
