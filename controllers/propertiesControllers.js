@@ -98,7 +98,7 @@ export const getSingleProperty = async (req, res) => {
 
   const property = await Property.findById(propertyId);
 
-  if(!property) {
+  if (!property) {
     return res.status(404).json({
       success: false,
       message: "Property not found"
@@ -108,7 +108,7 @@ export const getSingleProperty = async (req, res) => {
   await Property.updateOne({
     _id: propertyId
   }, {
-    $inc: {views: 1}
+    $inc: { views: 1 }
   })
 
   return res.json({
@@ -127,21 +127,21 @@ export const getRecentProperties = async (req, res) => {
       .limit(limit)
       .lean();
 
-      const propertyIds = properties.map(p => p._id);
-      if(propertyIds.length > 0) {
-        await Property.updateMany(
-          {
-            _id: {
-              $in: propertyIds
-            }
-          },
-          {
-            $inc: {
-              impressions: 1
-            }
+    const propertyIds = properties.map(p => p._id);
+    if (propertyIds.length > 0) {
+      await Property.updateMany(
+        {
+          _id: {
+            $in: propertyIds
           }
-        )
-      }
+        },
+        {
+          $inc: {
+            impressions: 1
+          }
+        }
+      )
+    }
 
     return res.json({
       success: true,
@@ -279,12 +279,6 @@ export const searchPlaces = async (req, res) => {
 export const filteredProperties = async (req, res) => {
   const { locality, city, mode } = req.body;
 
-  console.log({
-    locality,
-    city,
-    mode
-  })
-
   const formatLocality = (locality) => {
     let formatted = locality.replace(/(\d+)/g, ' $1');
     formatted = formatted.replace(/([a-z])([A-Z])/g, '$1 $2');
@@ -320,7 +314,7 @@ export const filteredProperties = async (req, res) => {
 };
 
 export const contactOwner = async (req, res) => {
-  const {propertyId} = req.body;
+  const { propertyId } = req.body;
   const property = await Property.findById(propertyId);
   if (!property) {
     return res.status(404).json({
@@ -332,17 +326,43 @@ export const contactOwner = async (req, res) => {
   await Property.updateOne({
     _id: propertyId
   },
-  {
-    $inc: {
-      generatedLeads: 1
+    {
+      $inc: {
+        generatedLeads: 1
+      }
     }
-  }
-)
+  )
 
-//TODO : Logic for sending message/notidication to the owner. 
+  //TODO : Logic for sending message/notidication to the owner. 
 
-return res.json({
-  success: true,
-  message: "owner contacted."
-})
+  return res.json({
+    success: true,
+    message: "owner contacted."
+  })
 }
+
+export const getAllPropertiesInCity = async (req, res) => {
+  const { city } = req.body;
+  console.log('city', city);
+
+  try {
+    // Fetch only the required fields and limit the response to 8 properties
+    const properties = await Property
+      .find({ "address.city": city })
+      .select("title askedPrice address images") // Add required fields here
+      .limit(8);
+
+    return res.json({
+      message: 'Get all properties in city',
+      success: true,
+      properties
+    });
+  } catch (error) {
+    console.error('Error fetching properties:', error);
+    return res.status(500).json({
+      message: 'Failed to fetch properties',
+      success: false,
+      error: error.message
+    });
+  }
+};
