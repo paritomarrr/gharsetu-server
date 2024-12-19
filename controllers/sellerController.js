@@ -57,3 +57,4 @@ export const getSellerName = async (req, res) => {
         return res.status(500).json({ success: false, error: error.message, sellerId });
     }
 };
+
