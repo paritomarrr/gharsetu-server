@@ -7,38 +7,20 @@ export const suggestPlaces = async (req, res) => {
         }
 
         const { query } = req.body;
-        const response = await axios.get(
-            'https://api.mapbox.com/search/geocode/v6/forward', {
-                params: {
-                    q: encodeURIComponent(query),
-                    access_token: 'pk.eyJ1IjoicGFyaXRvbWFyciIsImEiOiJjbTJ5Zmw1aXYwMDl3MmxzaG91bWRnNXgxIn0.ukF28kdk13Vf2y1EOKQFWg',
-                }
-            }
-        );
 
-        const suggestions = response.data.features
-            .filter(feature => feature.properties.feature_type === 'locality')
-            .map(feature => ({
-                id: feature.id,
-                name: feature.properties.name,
-                full_address: feature.properties.full_address,
-                coordinates: {
-                    longitude: feature.properties.coordinates.longitude,
-                    latitude: feature.properties.coordinates.latitude
-                },
-                city: feature.properties.context?.place?.name || feature.properties.name, // Added city
-                country: feature.properties.context?.country?.name || null,
-                region: feature.properties.context?.region?.name || null,
-            }));
+        const response = await axios.get(`https://api.mapbox.com/search/searchbox/v1/suggest?q=${query}&language=en&limit=5&session_token=1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed&country=IN&access_token=pk.eyJ1IjoicGFyaXRvbWFyciIsImEiOiJjbTJ5Zmw1aXYwMDl3MmxzaG91bWRnNXgxIn0.ukF28kdk13Vf2y1EOKQFWg`);
 
+        console.log('response:', response.data);
+        
         return res.status(200).json({
             success: true,
-            data: suggestions
+            query: query,
+            response: response.data
         });
 
     } catch (error) {
         console.error('Error in suggestPlaces:', error);
-        
+
         if (error.response?.status === 401) {
             return res.status(401).json({ error: 'Invalid Mapbox access token' });
         }
@@ -49,3 +31,17 @@ export const suggestPlaces = async (req, res) => {
         });
     }
 };
+
+export const getCoordinates = async (req, res) => {
+    const {query} = req.body;
+
+    const response = await axios.get(`https://api.mapbox.com/search/geocode/v6/forward?q=${query}&access_token=pk.eyJ1IjoicGFyaXRvbWFyciIsImEiOiJjbTJ5Zmw1aXYwMDl3MmxzaG91bWRnNXgxIn0.ukF28kdk13Vf2y1EOKQFWg`)
+
+    const coordinates = response.data.features[0].geometry.coordinates;
+
+    return res.status(200).json({
+        success: true,
+        coordinates: coordinates
+    });
+
+}
