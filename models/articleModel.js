@@ -22,10 +22,6 @@ const articleSchema = new mongoose.Schema({
         type: [String],
         required: false,
         default: []
-    },
-    content: {
-        type: 'String',
-        required: true
     }
 }, {
     timestamps: true
