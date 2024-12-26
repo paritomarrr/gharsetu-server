@@ -7,9 +7,9 @@ export const articlesTest = (req, res) => {
 }
 
 export const createArticle = async (req, res) => {
-    const { slug, title, excerpt, image, tags } = req.body;
+    const { slug, title, excerpt, image, tags, content } = req.body;
     try {
-        const article = new Article({ slug, title, excerpt, image, tags });
+        const article = new Article({ slug, title, excerpt, image, tags, content });
         await article.save();
         res.status(201).json({
             success: true,
