@@ -1,10 +1,32 @@
 import mongoose from "mongoose";
 
+const reviewSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "NewUserr",
+        required: true,
+    },
+    review: {
+        type: String,
+        required: true,
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+});
+
 const propertySchema = new mongoose.Schema(
     {
         ownerId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "NewUserr",
             required: true,
         },
         verified: {
@@ -125,7 +147,7 @@ const propertySchema = new mongoose.Schema(
         impressions: { type: Number, default: 0 },
         views: { type: Number, default: 0 },
         generatedLeads: { type: Number, default: 0 },
-      
+        reviews: [reviewSchema],
     },
     { timestamps: true }
 );

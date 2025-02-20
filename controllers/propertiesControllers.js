@@ -1,5 +1,5 @@
 import Property from '../models/propertyModel.js';
-import User from "../models/userModel.js";
+import User from "../models/userModel.js"; // Ensure User model is imported
 
 
 export const propertiesTest = (req, res) => {
@@ -362,6 +362,71 @@ export const getAllPropertiesInCity = async (req, res) => {
     return res.status(500).json({
       message: 'Failed to fetch properties',
       success: false,
+      error: error.message
+    });
+  }
+};
+
+export const getPropertyReviews = async (req, res) => {
+  const { propertyId } = req.params;
+
+  try {
+    const property = await Property.findById(propertyId).populate('reviews.userId', 'firstName lastName');
+
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found"
+      });
+    }
+
+    return res.json({
+      success: true,
+      reviews: property.reviews
+    });
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch reviews",
+      error: error.message
+    });
+  }
+};
+
+export const submitPropertyReview = async (req, res) => {
+  const { propertyId } = req.params;
+  const { userId, review, rating } = req.body;
+
+  try {
+    const property = await Property.findById(propertyId);
+
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found"
+      });
+    }
+
+    const newReview = {
+      userId,
+      review,
+      rating
+    };
+
+    property.reviews.push(newReview);
+    await property.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Review submitted successfully",
+      review: newReview
+    });
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to submit review",
       error: error.message
     });
   }
