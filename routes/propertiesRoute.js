@@ -1,5 +1,5 @@
 import express from 'express'
-import {propertiesTest, createProperty, getAllProperties, getSingleProperty, filteredProperties ,getRecentProperties, deleteProperty, sellerProfile, searchPlaces, getAllPropertiesInCity, getPropertyReviews, submitPropertyReview} from '../controllers/propertiesControllers.js'
+import {propertiesTest, createProperty, getAllProperties, getSingleProperty, filteredProperties ,getRecentProperties, deleteProperty, sellerProfile, searchPlaces, getAllPropertiesInCity, getPropertyReviews, submitPropertyReview, deletePropertyReview} from '../controllers/propertiesControllers.js'
 
 const PropertiesRoutes = express.Router()
 
@@ -15,5 +15,6 @@ PropertiesRoutes.post('/filteredProperties', filteredProperties)
 PropertiesRoutes.post('/getProertiesByCity', getAllPropertiesInCity)
 PropertiesRoutes.get('/:propertyId/reviews', getPropertyReviews)
 PropertiesRoutes.post('/:propertyId/reviews', submitPropertyReview)
+PropertiesRoutes.delete("/:propertyId/reviews/:reviewId", deletePropertyReview);
 
 export default PropertiesRoutes

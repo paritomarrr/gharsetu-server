@@ -431,3 +431,44 @@ export const submitPropertyReview = async (req, res) => {
     });
   }
 };
+
+export const deletePropertyReview = async (req, res) => {
+  const { propertyId, reviewId } = req.params;
+
+  try {
+    const property = await Property.findById(propertyId);
+
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
+    }
+
+    const reviewIndex = property.reviews.findIndex(
+      (review) => review._id.toString() === reviewId
+    );
+
+    if (reviewIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+    }
+
+    property.reviews.splice(reviewIndex, 1);
+    await property.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete review",
+      error: error.message,
+    });
+  }
+};
