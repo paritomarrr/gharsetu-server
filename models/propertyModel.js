@@ -77,6 +77,14 @@ const propertySchema = new mongoose.Schema(
         area: {
             type: String,
         },
+        bhk: {
+            type: Number,
+            required: true,
+        },
+        baths: {
+            type: Number,
+            required: true,
+        },
         address: {
             houseNumber: {
                 type: String,

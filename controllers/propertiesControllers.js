@@ -1,5 +1,5 @@
 import Property from '../models/propertyModel.js';
-import User from "../models/userModel.js"; // Ensure User model is imported
+import User from "../models/userModel.js";
 
 
 export const propertiesTest = (req, res) => {
@@ -23,6 +23,8 @@ export const createProperty = async (req, res) => {
       availableFor,
       project,
       area,
+      bhk,
+      baths,
       address,
       plotSize,
       furnishType,
@@ -50,6 +52,8 @@ export const createProperty = async (req, res) => {
       availableFor,
       project,
       area,
+      bhk,
+      baths,
       address,
       plotSize,
       furnishType,
