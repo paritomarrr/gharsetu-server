@@ -23,8 +23,6 @@ export const createProperty = async (req, res) => {
       availableFor,
       project,
       area,
-      bhk,
-      baths,
       address,
       plotSize,
       furnishType,
@@ -34,7 +32,8 @@ export const createProperty = async (req, res) => {
       propertyStatus,
       coordinates,
       images,
-      description
+      description,
+      bhkConfig
     } = req.body;
 
     console.log('oD', ownerId)
@@ -52,8 +51,6 @@ export const createProperty = async (req, res) => {
       availableFor,
       project,
       area,
-      bhk,
-      baths,
       address,
       plotSize,
       furnishType,
@@ -63,7 +60,8 @@ export const createProperty = async (req, res) => {
       propertyStatus,
       coordinates,
       images,
-      description
+      description,
+      bhkConfig
     });
 
     console.log('description', description)
@@ -472,6 +470,87 @@ export const deletePropertyReview = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to delete review",
+      error: error.message,
+    });
+  }
+};
+
+export const updateProperty = async (req, res) => {
+  const { propertyId } = req.params;
+  const {
+    ownerId,
+    listedBy,
+    firstName,
+    lastName,
+    phoneNumber,
+    email,
+    propertyType,
+    firmName,
+    propertySubType,
+    availableFor,
+    project,
+    area,
+    address,
+    plotSize,
+    furnishType,
+    flatFurnishings,
+    societyAmenities,
+    askedPrice,
+    propertyStatus,
+    coordinates,
+    images,
+    description,
+    bhkConfig
+  } = req.body;
+
+  try {
+    const updatedProperty = await Property.findByIdAndUpdate(
+      propertyId,
+      {
+        ownerId,
+        listedBy,
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        propertyType,
+        firmName,
+        propertySubType,
+        availableFor,
+        project,
+        area,
+        address,
+        plotSize,
+        furnishType,
+        flatFurnishings,
+        societyAmenities,
+        askedPrice,
+        propertyStatus,
+        coordinates,
+        images,
+        description,
+        bhkConfig
+      },
+      { new: true }
+    );
+
+    if (!updatedProperty) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Property updated successfully",
+      property: updatedProperty,
+    });
+  } catch (error) {
+    console.error("Error updating property:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update property",
       error: error.message,
     });
   }

@@ -77,14 +77,6 @@ const propertySchema = new mongoose.Schema(
         area: {
             type: String,
         },
-        bhk: {
-            type: Number,
-            required: true,
-        },
-        baths: {
-            type: Number,
-            required: true,
-        },
         address: {
             houseNumber: {
                 type: String,
@@ -129,6 +121,10 @@ const propertySchema = new mongoose.Schema(
         },
         flatFurnishings: {
             type: [String]
+        },
+        bhkConfig: {
+            type: String,
+            required: true,
         },
         societyAmenities: {
             type: [String]
