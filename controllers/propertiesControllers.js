@@ -32,7 +32,8 @@ export const createProperty = async (req, res) => {
       propertyStatus,
       coordinates,
       images,
-      description
+      description,
+      bhkConfig
     } = req.body;
 
     console.log('oD', ownerId)
@@ -59,7 +60,8 @@ export const createProperty = async (req, res) => {
       propertyStatus,
       coordinates,
       images,
-      description
+      description,
+      bhkConfig
     });
 
     console.log('description', description)
@@ -363,6 +365,193 @@ export const getAllPropertiesInCity = async (req, res) => {
       message: 'Failed to fetch properties',
       success: false,
       error: error.message
+    });
+  }
+};
+
+export const getPropertyReviews = async (req, res) => {
+  const { propertyId } = req.params;
+
+  try {
+    const property = await Property.findById(propertyId).populate('reviews.userId', 'firstName lastName');
+
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found"
+      });
+    }
+
+    return res.json({
+      success: true,
+      reviews: property.reviews
+    });
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch reviews",
+      error: error.message
+    });
+  }
+};
+
+export const submitPropertyReview = async (req, res) => {
+  const { propertyId } = req.params;
+  const { userId, review, rating } = req.body;
+
+  try {
+    const property = await Property.findById(propertyId);
+
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found"
+      });
+    }
+
+    const newReview = {
+      userId,
+      review,
+      rating
+    };
+
+    property.reviews.push(newReview);
+    await property.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Review submitted successfully",
+      review: newReview
+    });
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to submit review",
+      error: error.message
+    });
+  }
+};
+
+export const deletePropertyReview = async (req, res) => {
+  const { propertyId, reviewId } = req.params;
+
+  try {
+    const property = await Property.findById(propertyId);
+
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
+    }
+
+    const reviewIndex = property.reviews.findIndex(
+      (review) => review._id.toString() === reviewId
+    );
+
+    if (reviewIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+    }
+
+    property.reviews.splice(reviewIndex, 1);
+    await property.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete review",
+      error: error.message,
+    });
+  }
+};
+
+export const updateProperty = async (req, res) => {
+  const { propertyId } = req.params;
+  const {
+    ownerId,
+    listedBy,
+    firstName,
+    lastName,
+    phoneNumber,
+    email,
+    propertyType,
+    firmName,
+    propertySubType,
+    availableFor,
+    project,
+    area,
+    address,
+    plotSize,
+    furnishType,
+    flatFurnishings,
+    societyAmenities,
+    askedPrice,
+    propertyStatus,
+    coordinates,
+    images,
+    description,
+    bhkConfig
+  } = req.body;
+
+  try {
+    const updatedProperty = await Property.findByIdAndUpdate(
+      propertyId,
+      {
+        ownerId,
+        listedBy,
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        propertyType,
+        firmName,
+        propertySubType,
+        availableFor,
+        project,
+        area,
+        address,
+        plotSize,
+        furnishType,
+        flatFurnishings,
+        societyAmenities,
+        askedPrice,
+        propertyStatus,
+        coordinates,
+        images,
+        description,
+        bhkConfig
+      },
+      { new: true }
+    );
+
+    if (!updatedProperty) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Property updated successfully",
+      property: updatedProperty,
+    });
+  } catch (error) {
+    console.error("Error updating property:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update property",
+      error: error.message,
     });
   }
 };
