@@ -588,7 +588,8 @@ export const filterPropertiesByShape = async (req, res) => {
 
       const properties = await Property.find({
           "coordinates.longitude": { $exists: true }, 
-          "coordinates.latitude": { $exists: true }, 
+          "coordinates.latitude": { $exists: true },
+          "availableFor": mode === 'rent' ? 'Rent' : 'Sell'
       }).lean();
 
       console.log("Fetched properties:", properties.length);
