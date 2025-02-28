@@ -1,6 +1,6 @@
 import Property from '../models/propertyModel.js';
 import User from "../models/userModel.js";
-
+import mongoose from 'mongoose';
 
 export const propertiesTest = (req, res) => {
   res.json({
@@ -553,5 +553,62 @@ export const updateProperty = async (req, res) => {
       message: "Failed to update property",
       error: error.message,
     });
+  }
+};
+
+const isPointInsidePolygon = (point, polygon) => {
+  let inside = false;
+  const x = point[0], y = point[1];
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i][0], yi = polygon[i][1];
+      const xj = polygon[j][0], yj = polygon[j][1];
+
+      const intersect = ((yi > y) !== (yj > y)) &&
+          (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+      
+      if (intersect) inside = !inside;
+  }
+
+  return inside;
+};
+
+
+export const filterPropertiesByShape = async (req, res) => {
+  try {
+      const { shape, mode } = req.body;
+
+      if (!shape || !shape.geometry || !shape.geometry.coordinates) {
+          console.error("Invalid shape data received:", JSON.stringify(shape, null, 2));
+          return res.status(400).json({ success: false, message: "Invalid shape data" });
+      }
+
+      const coordinates = shape.geometry.coordinates[0].map(coord => [coord[0], coord[1]]);
+      console.log("Received shape coordinates:", JSON.stringify(coordinates, null, 2));
+
+      const properties = await Property.find({
+          "coordinates.longitude": { $exists: true }, 
+          "coordinates.latitude": { $exists: true },
+          "availableFor": mode === 'rent' ? 'Rent' : 'Sell'
+      }).lean();
+
+      console.log("Fetched properties:", properties.length);
+
+      const filteredProperties = properties.filter(property => {
+          if (!property.coordinates || !property.coordinates.longitude || !property.coordinates.latitude) {
+              console.error("Missing coordinates in property:", property);
+              return false;
+          }
+
+          const propCoords = [property.coordinates.longitude, property.coordinates.latitude];
+          return isPointInsidePolygon(propCoords, coordinates);
+      });
+
+      console.log("Filtered properties count:", filteredProperties.length);
+
+      return res.json({ success: true, properties: filteredProperties });
+  } catch (error) {
+      console.error("Error filtering properties by shape:", error);
+      return res.status(500).json({ success: false, message: "Failed to filter properties by shape", error: error.message });
   }
 };
