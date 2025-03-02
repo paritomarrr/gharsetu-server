@@ -59,6 +59,10 @@ export const createProperty = async (req, res) => {
       askedPrice,
       propertyStatus,
       coordinates,
+      location: {
+        type: "Point",
+        coordinates: [coordinates.longitude, coordinates.latitude]
+      },
       images,
       description,
       bhkConfig
@@ -610,5 +614,35 @@ export const filterPropertiesByShape = async (req, res) => {
   } catch (error) {
       console.error("Error filtering properties by shape:", error);
       return res.status(500).json({ success: false, message: "Failed to filter properties by shape", error: error.message });
+  }
+};
+
+export const getNearbyProperties = async (req, res) => {
+  const { coordinates, propertyId } = req.body;
+  console.log("Received coordinates:", coordinates);
+  try {
+    const properties = await Property.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [coordinates.longitude, coordinates.latitude]
+          },
+          $maxDistance: 1000000
+        }
+      },
+      _id: { $ne: propertyId } // Exclude the current property
+    });
+    console.log("Found nearby properties:", properties);
+    if (properties.length === 0) {
+      console.log("No properties found within the specified radius.");
+    }
+    res.status(200).json({
+      success: true,
+      properties
+    });
+  } catch (error) {
+    console.error("Error fetching nearby properties:", error);
+    res.status(500).json({ message: error.message });
   }
 };
