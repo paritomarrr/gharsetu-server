@@ -147,17 +147,6 @@ const propertySchema = new mongoose.Schema(
                 required: true
             },
         },
-        location: {
-            type: {
-                type: String,
-                enum: ['Point'],
-                required: true
-            },
-            coordinates: {
-                type: [Number],
-                required: true
-            }
-        },
         images: { type: Array }, 
         impressions: { type: Number, default: 0 },
         views: { type: Number, default: 0 },
@@ -172,8 +161,6 @@ propertySchema.index({
     "address.city": 1, 
     "address.state": 1 
 });
-
-propertySchema.index({ location: '2dsphere' });
 
 const Property = mongoose.model("PropertyV2", propertySchema);
 

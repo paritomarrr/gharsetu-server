@@ -622,27 +622,47 @@ export const getNearbyProperties = async (req, res) => {
   console.log("Received coordinates:", coordinates);
   try {
     const properties = await Property.find({
-      location: {
-        $near: {
-          $geometry: {
-            type: "Point",
-            coordinates: [coordinates.longitude, coordinates.latitude]
-          },
-          $maxDistance: 1000000
-        }
-      },
+      "coordinates.latitude": { $exists: true },
+      "coordinates.longitude": { $exists: true },
       _id: { $ne: propertyId } // Exclude the current property
-    });
-    console.log("Found nearby properties:", properties);
-    if (properties.length === 0) {
+    }).lean();
+
+    const nearbyProperties = properties
+      .map(property => {
+        const distance = calculateDistance(
+          coordinates.latitude,
+          coordinates.longitude,
+          property.coordinates.latitude,
+          property.coordinates.longitude
+        );
+        return { ...property, distance };
+      })
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 6); // Get only the 4 closest properties
+
+    console.log("Found nearby properties:", nearbyProperties);
+    if (nearbyProperties.length === 0) {
       console.log("No properties found within the specified radius.");
     }
     res.status(200).json({
       success: true,
-      properties
+      properties: nearbyProperties
     });
   } catch (error) {
     console.error("Error fetching nearby properties:", error);
     res.status(500).json({ message: error.message });
   }
+};
+
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distance in km
+  return distance;
 };
