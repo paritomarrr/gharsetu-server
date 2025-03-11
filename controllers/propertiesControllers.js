@@ -283,41 +283,45 @@ export const searchPlaces = async (req, res) => {
 };
 
 export const filteredProperties = async (req, res) => {
-  const { locality, city, mode } = req.body;
+  const { locality, city, mode, minPrice, maxPrice } = req.body;
 
   const formatLocality = (locality) => {
-    let formatted = locality.replace(/(\d+)/g, ' $1');
-    formatted = formatted.replace(/([a-z])([A-Z])/g, '$1 $2');
-    formatted = formatted.trim();
+    let formatted = locality.replace(/(\d+)/g, ' $1'); 
+    formatted = formatted.replace(/\s+/g, ' ').trim(); 
     return formatted;
   };
+  
 
-  console.log('formatted', formatLocality(locality));
+  const formattedLocality = formatLocality(locality);
 
   try {
+    const query = {
+      "address.locality": formattedLocality,
+      "address.city": city,
+      "availableFor": mode === 'rent' ? 'Rent' : 'Sell'
+    };
 
-    const properties = await Property.find({
-      $and: [
-        { "address.locality": formatLocality(locality) },
-        { "address.city": city },
-        { "availableFor": mode === 'rent' ? 'Rent' : 'Sell' }
-      ]
-    });
+    // Apply price filter if set
+    if (minPrice !== undefined) query.askedPrice = { $gte: Number(minPrice) };
+    if (maxPrice !== undefined) query.askedPrice = { ...query.askedPrice, $lte: Number(maxPrice) };
 
+    const properties = await Property.find(query);
     return res.json({
       message: 'Properties found',
       success: true,
       count: properties.length,
       properties
     });
+
   } catch (error) {
     return res.status(500).json({
       message: 'Error fetching properties',
       success: false,
       error: error.message
-    })
+    });
   }
 };
+
 
 export const contactOwner = async (req, res) => {
   const { propertyId } = req.body;
