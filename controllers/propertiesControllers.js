@@ -33,7 +33,8 @@ export const createProperty = async (req, res) => {
       coordinates,
       images,
       description,
-      bhkConfig
+      bhkConfig,
+      propertyAge
     } = req.body;
 
     console.log('oD', ownerId)
@@ -65,7 +66,8 @@ export const createProperty = async (req, res) => {
       },
       images,
       description,
-      bhkConfig
+      bhkConfig,
+      propertyAge
     });
 
     console.log('description', description)
@@ -508,7 +510,8 @@ export const updateProperty = async (req, res) => {
     coordinates,
     images,
     description,
-    bhkConfig
+    bhkConfig,
+    propertyAge
   } = req.body;
 
   try {
@@ -537,7 +540,8 @@ export const updateProperty = async (req, res) => {
         coordinates,
         images,
         description,
-        bhkConfig
+        bhkConfig,
+        propertyAge
       },
       { new: true }
     );

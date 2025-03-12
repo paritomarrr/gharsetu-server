@@ -147,6 +147,10 @@ const propertySchema = new mongoose.Schema(
                 required: true
             },
         },
+        propertyAge: {
+            type: String,
+            required: true
+        },
         images: { type: Array }, 
         impressions: { type: Number, default: 0 },
         views: { type: Number, default: 0 },
