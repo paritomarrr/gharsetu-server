@@ -57,11 +57,6 @@ export const saveUserDetails = async (req, res) => {
 export const bookmarkProperty = async (req, res) => {
     const {userId, propertyId} = req.body;
 
-    console.log(
-        "userId", userId,
-        "propertyId", propertyId
-    )
-
     if(!userId || !propertyId) {
         return res.json({
             success: false,
@@ -71,8 +66,6 @@ export const bookmarkProperty = async (req, res) => {
 
     try {
         const currUser = await User.findById(userId);
-
-        console.log('currUser', currUser);
 
         if (!currUser) {
             return res.json({
@@ -190,19 +183,3 @@ export const unbookmarkProperty = async (req, res) => {
         });
     }
 }
-
-export const getCurrentUser = async (req, res) => {
-    const { userId } = req.body;
-    if (!userId) {
-        return res.status(400).json({ success: false, message: "User ID not provided" });
-    }
-    try {
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
-        }
-        res.status(200).json({ success: true, user });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
