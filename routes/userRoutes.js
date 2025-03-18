@@ -12,4 +12,4 @@ userRoutes.post('/getSellerName', getSellerName)
 userRoutes.post('/saveProperty', bookmarkProperty)
 userRoutes.post('/getBookmarkedProperties', getBookmarkedProperties)
 
-export default userRoutes 
+export default userRoutes

@@ -57,11 +57,6 @@ export const saveUserDetails = async (req, res) => {
 export const bookmarkProperty = async (req, res) => {
     const {userId, propertyId} = req.body;
 
-    console.log(
-        "userId", userId,
-        "propertyId", propertyId
-    )
-
     if(!userId || !propertyId) {
         return res.json({
             success: false,
@@ -71,8 +66,6 @@ export const bookmarkProperty = async (req, res) => {
 
     try {
         const currUser = await User.findById(userId);
-
-        console.log('currUser', currUser);
 
         if (!currUser) {
             return res.json({
