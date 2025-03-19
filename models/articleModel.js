@@ -26,11 +26,18 @@ const articleSchema = new mongoose.Schema({
     content: {
         type: 'String',
         required: true
+    },
+    isPublished: {
+        type: Boolean,
+        default: true
+    },
+    scheduleDate: {
+        type: Date,
+        required: false
     }
 }, {
     timestamps: true
-}
-);
+});
 
 const Article = mongoose.models.Article || mongoose.model("Article", articleSchema);
-export default Article; 
+export default Article;
