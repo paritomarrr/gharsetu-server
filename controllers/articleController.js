@@ -1,4 +1,5 @@
 import Article from "../models/articleModel.js";
+import User from "../models/userModel.js";
 import schedule from "node-schedule";
 
 export const articlesTest = (req, res) => {
@@ -24,7 +25,6 @@ export const createArticle = async (req, res) => {
         await article.save();
 
         if (scheduleDate) {
-            console.log("Scheduling article for:", new Date(scheduleDate));
             schedule.scheduleJob(new Date(scheduleDate), async () => {
                 try {
                     const scheduledArticle = await Article.findById(article._id);
@@ -100,6 +100,34 @@ export const getRandomArticles = async (req, res) => {
         res.status(200).json({
             success: true,
             articles
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const addComment = async (req, res) => {
+    const { slug } = req.params;
+    const { userId, text } = req.body;
+
+    try {
+        const article = await Article.findOne({ slug });
+        if (!article) {
+            return res.status(404).json({ success: false, message: "Article not found" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const newComment = { name: `${user.firstName} ${user.lastName}`, text, date: new Date() };
+        article.comments.push(newComment);
+        await article.save();
+
+        res.status(201).json({
+            success: true,
+            comments: article.comments
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
