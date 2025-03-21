@@ -85,3 +85,23 @@ export const getArticleBySlug = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getRandomArticles = async (req, res) => {
+    const { excludeSlug } = req.query;
+    try {
+        const matchCondition = { isPublished: true };
+        if (excludeSlug) {
+            matchCondition.slug = { $ne: excludeSlug };
+        }
+        const articles = await Article.aggregate([
+            { $match: matchCondition },
+            { $sample: { size: 2 } }
+        ]);
+        res.status(200).json({
+            success: true,
+            articles
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
