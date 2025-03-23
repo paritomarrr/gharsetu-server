@@ -95,7 +95,7 @@ export const getRandomArticles = async (req, res) => {
         }
         const articles = await Article.aggregate([
             { $match: matchCondition },
-            { $sample: { size: 2 } }
+            { $sample: { size: 4 } }
         ]);
         res.status(200).json({
             success: true,
