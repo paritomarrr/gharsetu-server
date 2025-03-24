@@ -1,5 +1,20 @@
 import mongoose from "mongoose";
 
+const commentSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    text: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    }
+});
+
 const articleSchema = new mongoose.Schema({
     slug: {
         type: String,
@@ -34,7 +49,8 @@ const articleSchema = new mongoose.Schema({
     scheduleDate: {
         type: Date,
         required: false
-    }
+    },
+    comments: [commentSchema]
 }, {
     timestamps: true
 });

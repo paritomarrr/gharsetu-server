@@ -1,4 +1,5 @@
 import Property from '../models/propertyModel.js';
+import Review from '../models/reviewModel.js';
 import User from "../models/userModel.js";
 import mongoose from 'mongoose';
 
@@ -383,7 +384,7 @@ export const getPropertyReviews = async (req, res) => {
   const { propertyId } = req.params;
 
   try {
-    const property = await Property.findById(propertyId).populate('reviews.userId', 'firstName lastName');
+    const property = await Property.findById(propertyId).populate('reviews');
 
     if (!property) {
       return res.status(404).json({
@@ -392,9 +393,11 @@ export const getPropertyReviews = async (req, res) => {
       });
     }
 
+    const reviews = await Review.find({ _id: { $in: property.reviews } }).populate('userId', 'firstName lastName');
+
     return res.json({
       success: true,
-      reviews: property.reviews
+      reviews
     });
   } catch (error) {
     console.error("Error fetching reviews:", error);
@@ -420,13 +423,15 @@ export const submitPropertyReview = async (req, res) => {
       });
     }
 
-    const newReview = {
+    const newReview = new Review({
       userId,
       review,
       rating
-    };
+    });
 
-    property.reviews.push(newReview);
+    await newReview.save();
+
+    property.reviews.push(newReview._id);
     await property.save();
 
     return res.status(201).json({
@@ -457,9 +462,7 @@ export const deletePropertyReview = async (req, res) => {
       });
     }
 
-    const reviewIndex = property.reviews.findIndex(
-      (review) => review._id.toString() === reviewId
-    );
+    const reviewIndex = property.reviews.indexOf(reviewId);
 
     if (reviewIndex === -1) {
       return res.status(404).json({
@@ -470,6 +473,8 @@ export const deletePropertyReview = async (req, res) => {
 
     property.reviews.splice(reviewIndex, 1);
     await property.save();
+
+    await Review.findByIdAndDelete(reviewId);
 
     return res.status(200).json({
       success: true,
