@@ -286,22 +286,22 @@ export const searchPlaces = async (req, res) => {
 };
 
 export const filteredProperties = async (req, res) => {
-  const { locality, city, mode, minPrice, maxPrice } = req.body;
+  const { locality, city, mode, state, minPrice, maxPrice } = req.body;
 
   const formatLocality = (locality) => {
     let formatted = locality.replace(/(\d+)/g, ' $1'); 
     formatted = formatted.replace(/\s+/g, ' ').trim(); 
     return formatted;
   };
-  
 
-  const formattedLocality = formatLocality(locality);
+  const formattedLocality = locality ? formatLocality(locality) : undefined;
 
   try {
     const query = {
-      "address.locality": formattedLocality,
-      "address.city": city,
-      "availableFor": mode === 'rent' ? 'Rent' : 'Sell'
+      ...(formattedLocality && { "address.locality": formattedLocality }),
+      ...(city && { "address.city": city }),
+      ...(state && { "address.state": state }),
+      "availableFor": mode === 'rent' ? 'Rent' : 'Sell',
     };
 
     // Apply price filter if set
