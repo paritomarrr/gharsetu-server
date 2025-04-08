@@ -45,3 +45,57 @@ export const getCoordinates = async (req, res) => {
     });
 
 }
+
+export const suggestMainPlaces = async (req, res) => {
+    try {
+        if (!req.body?.query) {
+            return res.status(400).json({ error: 'Query parameter is required' });
+        }
+
+        const { query } = req.body;
+
+        // Use OpenStreetMap Nominatim API
+        const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+            params: {
+                q: query,
+                format: 'json',
+                addressdetails: 1,
+                limit: 5,
+                countrycodes: 'IN',
+            },
+        });
+
+        // Filter results to include only relevant place types
+        const filteredSuggestions = response.data.filter(item => {
+            return item.type === 'city' || item.type === 'town' || item.type === 'village' || item.type === 'locality';
+        });
+
+        const processedSuggestions = filteredSuggestions.map(item => {
+            const city = item.address.city || item.address.town || item.address.village || '';
+            const state = item.address.state || '';
+
+            return {
+                name: item.display_name.split(',')[0],
+                place_formatted: `${city}, ${state}`,
+                context: {
+                    place: { name: city },
+                    region: { name: state },
+                },
+            };
+        });
+
+        return res.status(200).json({
+            success: true,
+            query: query,
+            response: { suggestions: processedSuggestions },
+        });
+
+    } catch (error) {
+        console.error('Error in suggestMainPlaces:', error);
+
+        return res.status(500).json({
+            error: 'Failed to fetch main place suggestions',
+            message: error.message,
+        });
+    }
+};
