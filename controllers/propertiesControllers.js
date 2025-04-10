@@ -601,15 +601,12 @@ export const filterPropertiesByShape = async (req, res) => {
       }
 
       const coordinates = shape.geometry.coordinates[0].map(coord => [coord[0], coord[1]]);
-      console.log("Received shape coordinates:", JSON.stringify(coordinates, null, 2));
 
       const properties = await Property.find({
           "coordinates.longitude": { $exists: true }, 
           "coordinates.latitude": { $exists: true },
           "availableFor": mode === 'rent' ? 'Rent' : 'Sell'
       }).lean();
-
-      console.log("Fetched properties:", properties.length);
 
       const filteredProperties = properties.filter(property => {
           if (!property.coordinates || !property.coordinates.longitude || !property.coordinates.latitude) {
@@ -621,8 +618,6 @@ export const filterPropertiesByShape = async (req, res) => {
           return isPointInsidePolygon(propCoords, coordinates);
       });
 
-      console.log("Filtered properties count:", filteredProperties.length);
-
       return res.json({ success: true, properties: filteredProperties });
   } catch (error) {
       console.error("Error filtering properties by shape:", error);
@@ -632,7 +627,6 @@ export const filterPropertiesByShape = async (req, res) => {
 
 export const getNearbyProperties = async (req, res) => {
   const { coordinates, propertyId } = req.body;
-  console.log("Received coordinates:", coordinates);
   try {
     const properties = await Property.find({
       "coordinates.latitude": { $exists: true },
@@ -653,7 +647,6 @@ export const getNearbyProperties = async (req, res) => {
       .sort((a, b) => a.distance - b.distance)
       .slice(0, 6); // Get only the 4 closest properties
 
-    console.log("Found nearby properties:", nearbyProperties);
     if (nearbyProperties.length === 0) {
       console.log("No properties found within the specified radius.");
     }
