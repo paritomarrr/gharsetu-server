@@ -65,24 +65,21 @@ export const suggestMainPlaces = async (req, res) => {
             },
         });
 
-        // Filter results to include only relevant place types
-        const filteredSuggestions = response.data.filter(item => {
-            return item.type === 'city' || item.type === 'town' || item.type === 'village' || item.type === 'locality';
-        });
+        const processedSuggestions = response.data
+            .filter(item => item.address.city)
+            .map(item => {
+                const city = item.address.city || item.address.town || item.address.village || '';
+                const state = item.address.state || '';
 
-        const processedSuggestions = filteredSuggestions.map(item => {
-            const city = item.address.city || item.address.town || item.address.village || '';
-            const state = item.address.state || '';
-
-            return {
-                name: item.display_name.split(',')[0],
-                place_formatted: `${city}, ${state}`,
-                context: {
-                    place: { name: city },
-                    region: { name: state },
-                },
-            };
-        });
+                return {
+                    name: item.display_name.split(',')[0],
+                    place_formatted: `${city}, ${state}`,
+                    context: {
+                        place: { name: city },
+                        region: { name: state },
+                    },
+                };
+            });
 
         return res.status(200).json({
             success: true,
