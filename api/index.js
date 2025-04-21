@@ -11,6 +11,7 @@ import articleRoutes from '../routes/articlesRoutes.js'
 import statsRoutes from '../routes/statsRoutes.js'
 import compression from 'compression'; 
 import calculatorRoutes from '../routes/areaRoutes.js'
+import newsRoutes from '../routes/newsRoutes.js'
 
 const app = express()
 app.use(cors())
@@ -36,6 +37,7 @@ app.use('/api/v1/localitySuggestions', SuggestionRoutes)
 app.use('/api/v1/articles', articleRoutes)
 app.use('/api/v1/stats', statsRoutes)
 app.use('/api/v1/calculators', calculatorRoutes)
+app.use('/api/v1/news', newsRoutes)
 app.use((req, res) => {
     res.status(404).json({ success: false, message: 'Route not found' });
   });
